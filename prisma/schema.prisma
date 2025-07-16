@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "windows"]
+  binaryTargets = ["native", "windows", "linux-musl-openssl-3.0.x"]
   engineType    = "library"
 }
 
@@ -17,6 +17,19 @@ model Admin {
   role      String   @default("admin")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  loginAttempts LoginAttempt[]
 
   @@index([email]) // Индекс для ускорения поиска по email
+}
+
+model LoginAttempt {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  admin     Admin    @relation(fields: [adminId], references: [id])
+  attempts  Int      @default(0)
+  lastAttempt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([adminId]) // Индекс для ускорения поиска по adminId
 }
